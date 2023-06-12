@@ -70,23 +70,13 @@ def send_question(chat_id):
 @bot.message_handler(commands=['help'])
 def start(message: telebot.types.Message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    btn1 = types.KeyboardButton('/reset')
+    btn1 = types.KeyboardButton('Викторина')
     btn2 = types.KeyboardButton('Оставить отзыв')
     btn3 = types.KeyboardButton('Узнать подробнее')
     text = f'Привет {message.chat.username}! Предлагаю тебе пройти викторину и узнать свое тотемное животное'
     markup.add(btn1,btn2,btn3)
 
     bot.send_message(message.chat.id, text, reply_markup=markup)
-
-
-@bot.message_handler(commands=['reset'])
-def start_message(message):
-    global current_question
-
-    # Стартуем опрос
-    current_question = 0
-    send_question(message.chat.id)
-
 
 # Обработчик ответа на вопрос
 @bot.message_handler(content_types=['text'])
@@ -96,15 +86,18 @@ def handle_answer(message: telebot.types.Message):
     question = list(questions.keys())[current_question]
     possible_answers = [answer[0] for answer in questions[question]]
 
-    if message.text in possible_answers:
+    if message.text == 'Викторина':
 
+        send_question(message.chat.id)
+
+    if message.text in possible_answers:
 
         # Получаем текущий вопрос и возможные ответы на него
         question = list(questions.keys())[current_question]
         possible_answers = [answer[0] for answer in questions[question]]
 
         # Если ответ пользователя не является возможным ответом, выводим ошибку
-        if message.text not in possible_answers:
+        if  message.text not in possible_answers:
             bot.send_message(message.chat.id, 'Извините, я вас не понимаю')
             send_question(message.chat.id)  # повторно отправляем вопрос
             return
