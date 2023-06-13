@@ -1,15 +1,15 @@
 import telebot
 
 from telebot import types
-from config import TOKEN, contact
+from config import TOKEN, contact, FEEDBACK
 
 bot = telebot.TeleBot(TOKEN)
 
 # Определяем вопросы и ответы
 questions = {
-    'Q1. What color do you like the most?': [('Red', 3), ('Green', 2), ('Blue', 1), ('Yellow', 0)],
-    'Q2. What is your favorite drink?': [('Tea', 1), ('Coffee', 2), ('Coca-Cola', 3), ('Water', 0)],
-    'Q3. What is your favorite animal?': [('Cat', 2), ('Dog', 3), ('Horse', 1), ('Bird', 0)]
+    'Q1. Какой климат тебе больше нравится?': [('Жаркий', 3), ('Холодный', 2), ('Умеренный', 1)],
+    'Q2. Как ты относишься к воде?': [('Буквально живу в ней', 1), ('Бррр, уберите её подальше от меня', 2)],
+    'Q3. Что тебе сниться по ночам?': [('Рассекаю небесное пространство', 2), ('Дикая охота на дичь', 3), ('Представляю как сплю в тени', 1)]
 }
 
 # Определяем список ответов пользователей
@@ -90,14 +90,14 @@ def handle_answer(message: telebot.types.Message):
 
         send_question(message.chat.id)
 
-    if message.text in possible_answers:
+    elif message.text in possible_answers:
 
         # Получаем текущий вопрос и возможные ответы на него
         question = list(questions.keys())[current_question]
         possible_answers = [answer[0] for answer in questions[question]]
 
         # Если ответ пользователя не является возможным ответом, выводим ошибку
-        if  message.text not in possible_answers:
+        if message.text not in possible_answers:
             bot.send_message(message.chat.id, 'Извините, я вас не понимаю')
             send_question(message.chat.id)  # повторно отправляем вопрос
             return
@@ -112,9 +112,10 @@ def handle_answer(message: telebot.types.Message):
         current_question += 1
         send_question(message.chat.id)
 
+
     elif message.text == 'Оставить отзыв':
         markup = types.InlineKeyboardMarkup()
-        btn1 = types.InlineKeyboardButton('Оставить отзыв', url='https://moscowzoo.ru/animals/')
+        btn1 = types.InlineKeyboardButton('Оставить отзыв', url=FEEDBACK)
         markup.add(btn1)
 
         bot.reply_to(message, text='Перейдите по сслыку чтобы оставить отзыв', reply_markup=markup)
